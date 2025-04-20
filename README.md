@@ -17,16 +17,16 @@
 
 ### Block-level
 
-| Type            | Support |
-|-----------------|---------|
-| heading         | ⏳       |
-| blockquote      | ⏳       |
-| codeblock       | ⏳       |
-| unordered-list  | ⏳       |
-| ordered-list    | ⏳       |
-| table           | ⏳       |
-| horizontal-rule | ⏳       |
-| checkbox        | ⏳       |
+| Type                | Support |
+|---------------------|---------|
+| heading             | ⏳       |
+| blockquote          | ⏳       |
+| codeblock           | ⏳       |
+| unordered-list-item | ⏳       |
+| ordered-list-item   | ⏳       |
+| table               | ⏳       |
+| horizontal-rule     | ⏳       |
+| checkbox            | ⏳       |
 
 ## Build-in Renderer
 

@@ -1,5 +1,8 @@
 part of 'bad_markdown.dart';
 
+/// Build [MarkdownToken] from [RegExpMatch] instance.
+typedef MarkdownTokenBuilder = MarkdownToken Function(RegExpMatch match);
+
 sealed class MarkdownToken {
   /// Type name of token. (prefixed with `type_`)
   String get typename;
@@ -9,10 +12,37 @@ sealed class MarkdownToken {
 
   const MarkdownToken();
 
+  static const _typename2builder = <String, MarkdownTokenBuilder>{
+    // block-level
+    Heading._typename: Heading.fromMatch,
+    Blockquote._typename: Blockquote.fromMatch,
+
+    // inline-level
+    // ...
+
+    // non_exhaustive!()
+  };
+
   /// Generic parser for all [MarkdownToken].
   static MarkdownToken fromMatch(RegExpMatch match) {
-    throw UnimplementedError();
+    for (final MapEntry(key: typename, value: builder)
+        in _typename2builder.entries) {
+      final t = match.namedGroup(typename);
+      if (t != null) return builder(match);
+    }
+
+    return const MarkdownTokenNonsense();
   }
+}
+
+class MarkdownTokenNonsense extends MarkdownToken {
+  @override
+  String get source => throw UnsupportedError('unreachable!');
+
+  @override
+  String get typename => throw UnsupportedError('unreachable!');
+
+  const MarkdownTokenNonsense();
 }
 
 abstract class MarkdownTokenInline extends MarkdownToken {
@@ -88,6 +118,7 @@ class Blockquote extends MarkdownTokenBlock {
 
   @override
   String toString() {
-    return '[Blockquote] ${lines.length} lines';
+    final int line = lines.length;
+    return '[Blockquote] $line line${line == 1 ? '' : 's'}';
   }
 }

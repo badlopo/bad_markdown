@@ -4,26 +4,45 @@ part of 'bad_markdown.dart';
 typedef MarkdownTokenBuilder = MarkdownToken Function(RegExpMatch match);
 
 sealed class MarkdownToken {
-  /// Type name of token. (prefixed with `type_`)
-  String get typename;
+  static const List<String> _regexes = [
+    Heading.source,
+    Blockquote.source,
 
-  /// Regexp source of this token.
-  String get source;
+    // non_exhaustive!
+  ];
 
-  const MarkdownToken();
+  /// Parse raw content into [MarkdownToken] list.
+  static List<MarkdownToken> parse(String content) {
+    final combinedRegex = RegExp(_regexes.join('|'), multiLine: true);
+
+    List<MarkdownToken> tokens = [];
+    content.splitMapJoin(
+      combinedRegex,
+      onMatch: (match) {
+        tokens.add(fromMatch(match as RegExpMatch));
+        return '';
+      },
+      onNonMatch: (segment) {
+        tokens.add(Plaintext(segment));
+        return '';
+      },
+    );
+
+    return tokens;
+  }
 
   static const _typename2builder = <String, MarkdownTokenBuilder>{
     // block-level
-    Heading._typename: Heading.fromMatch,
-    Blockquote._typename: Blockquote.fromMatch,
+    Heading.typename: Heading.fromMatch,
+    Blockquote.typename: Blockquote.fromMatch,
 
     // inline-level
     // ...
 
-    // non_exhaustive!()
+    // non_exhaustive!
   };
 
-  /// Generic parser for all [MarkdownToken].
+  /// Parse [RegExpMatch] into [MarkdownToken].
   static MarkdownToken fromMatch(RegExpMatch match) {
     for (final MapEntry(key: typename, value: builder)
         in _typename2builder.entries) {
@@ -33,34 +52,37 @@ sealed class MarkdownToken {
 
     return const MarkdownTokenNonsense();
   }
+
+  const MarkdownToken();
+
+  InlineSpan render();
 }
 
 class MarkdownTokenNonsense extends MarkdownToken {
-  @override
-  String get source => throw UnsupportedError('unreachable!');
-
-  @override
-  String get typename => throw UnsupportedError('unreachable!');
-
   const MarkdownTokenNonsense();
-}
 
-abstract class MarkdownTokenInline extends MarkdownToken {
-  const MarkdownTokenInline();
+  @override
+  InlineSpan render() {
+    return const TextSpan(
+      text: 'Unsupported Token',
+      style: TextStyle(color: Colors.red),
+    );
+  }
 }
 
 abstract class MarkdownTokenBlock extends MarkdownToken {
   const MarkdownTokenBlock();
 }
 
+abstract class MarkdownTokenInline extends MarkdownToken {
+  const MarkdownTokenInline();
+}
+
 class Heading extends MarkdownTokenBlock {
-  static const String _typename = 'type_heading';
+  static const String typename = 'type_heading';
 
-  @override
-  String get typename => _typename;
-
-  @override
-  String get source => '(?<$_typename>^(?<hashes>#{1,6}) (?<title>.*)\$)';
+  static const String source =
+      '(?<$typename>^(?<hashes>#{1,6}) (?<title>.*)\$)';
 
   final int level;
   final String title;
@@ -70,7 +92,7 @@ class Heading extends MarkdownTokenBlock {
   factory Heading.fromMatch(RegExpMatch match) {
     assert(() {
       final names = match.groupNames.toSet();
-      return names.contains(_typename) &&
+      return names.contains(typename) &&
           names.contains('hashes') &&
           names.contains('title');
     }());
@@ -82,19 +104,20 @@ class Heading extends MarkdownTokenBlock {
   }
 
   @override
+  InlineSpan render() {
+    return HeadingRenderer(this).span();
+  }
+
+  @override
   String toString() {
     return '[Heading] <h$level> $title';
   }
 }
 
 class Blockquote extends MarkdownTokenBlock {
-  static const String _typename = 'type_blockquote';
+  static const String typename = 'type_blockquote';
 
-  @override
-  String get typename => _typename;
-
-  @override
-  String get source => '(?<$_typename>(> (.*)\n)+)';
+  static const String source = '(?<$typename>(> (.*)\n)+)';
 
   final List<String> lines;
 
@@ -103,12 +126,12 @@ class Blockquote extends MarkdownTokenBlock {
   factory Blockquote.fromMatch(RegExpMatch match) {
     assert(() {
       final names = match.groupNames.toSet();
-      return names.contains(_typename);
+      return names.contains(typename);
     }());
 
     return Blockquote(
       lines: match
-          .namedGroup(_typename)!
+          .namedGroup(typename)!
           .split('\n')
           .where((line) => line.isNotEmpty)
           .map((line) => line.substring(2))
@@ -117,8 +140,30 @@ class Blockquote extends MarkdownTokenBlock {
   }
 
   @override
+  InlineSpan render() {
+    // TODO
+    return WidgetSpan(child: Divider());
+  }
+
+  @override
   String toString() {
     final int line = lines.length;
     return '[Blockquote] $line line${line == 1 ? '' : 's'}';
+  }
+}
+
+class Plaintext extends MarkdownTokenInline {
+  final String content;
+
+  const Plaintext(this.content);
+
+  @override
+  TextSpan render() {
+    return TextSpan(text: content);
+  }
+
+  @override
+  String toString() {
+    return '[Plaintext] $content';
   }
 }

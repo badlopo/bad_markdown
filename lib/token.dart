@@ -55,14 +55,14 @@ sealed class MarkdownToken {
 
   const MarkdownToken();
 
-  InlineSpan render();
+  InlineSpan render(BuildContext context);
 }
 
 class MarkdownTokenNonsense extends MarkdownToken {
   const MarkdownTokenNonsense();
 
   @override
-  InlineSpan render() {
+  InlineSpan render(BuildContext context) {
     return const TextSpan(
       text: 'Unsupported Token',
       style: TextStyle(color: Colors.red),
@@ -104,8 +104,8 @@ class Heading extends MarkdownTokenBlock {
   }
 
   @override
-  InlineSpan render() {
-    return HeadingRenderer(this).span();
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.headingRendererOf(context)(this);
   }
 
   @override
@@ -140,9 +140,8 @@ class Blockquote extends MarkdownTokenBlock {
   }
 
   @override
-  InlineSpan render() {
-    // TODO
-    return WidgetSpan(child: Divider());
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.blockquoteRendererOf(context)(this);
   }
 
   @override
@@ -158,7 +157,7 @@ class Plaintext extends MarkdownTokenInline {
   const Plaintext(this.content);
 
   @override
-  TextSpan render() {
+  TextSpan render(BuildContext context) {
     return TextSpan(text: content);
   }
 

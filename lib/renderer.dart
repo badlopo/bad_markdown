@@ -1,39 +1,38 @@
 part of 'bad_markdown.dart';
 
-sealed class MarkdownRenderer<Token extends MarkdownToken> {
-  final Token token;
+typedef TokenRenderer<Token extends MarkdownToken> = InlineSpan Function(
+    Token token);
 
-  const MarkdownRenderer(this.token);
-
-  InlineSpan span();
+InlineSpan _heading(Heading token) {
+  return WidgetSpan(
+    child: Text(
+      token.title,
+      style: BadMarkdownStyles.headingStyles[token.level - 1],
+    ),
+  );
 }
 
-abstract class MarkdownRendererInline<Token extends MarkdownTokenInline>
-    extends MarkdownRenderer<Token> {
-  const MarkdownRendererInline(super.token);
-
-  @override
-  TextSpan span();
-}
-
-abstract class MarkdownRendererBlock<Token extends MarkdownTokenBlock>
-    extends MarkdownRenderer<Token> {
-  const MarkdownRendererBlock(super.token);
-
-  @override
-  InlineSpan span();
-}
-
-class HeadingRenderer extends MarkdownRendererBlock<Heading> {
-  const HeadingRenderer(super.token);
-
-  @override
-  WidgetSpan span() {
-    return WidgetSpan(
-      child: Text(
-        token.title,
-        style: BadMarkdownStyles.headingStyles[token.level - 1],
+WidgetSpan _blockquote(Blockquote token) {
+  return WidgetSpan(
+    child: Container(
+      padding: const EdgeInsets.only(left: 12),
+      decoration: const BoxDecoration(
+        border: Border(left: BorderSide(width: 4, color: Colors.grey)),
       ),
-    );
-  }
+      child: Text(
+        token.lines.join('\n'),
+        style: BadMarkdownStyles.blockquote,
+      ),
+    ),
+  );
+}
+
+class MarkdownRenderer {
+  final TokenRenderer<Heading> heading;
+  final TokenRenderer<Blockquote> blockquote;
+
+  const MarkdownRenderer({
+    this.heading = _heading,
+    this.blockquote = _blockquote,
+  });
 }

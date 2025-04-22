@@ -11,6 +11,7 @@ sealed class MarkdownToken {
 
     // inline-level
     Strong.source,
+    Emphasis.source,
 
     // non_exhaustive!
   ];
@@ -42,6 +43,7 @@ sealed class MarkdownToken {
 
     // inline-level
     Strong.typename: Strong.fromMatch,
+    Emphasis.typename: Emphasis.fromMatch,
 
     // non_exhaustive!
   };
@@ -193,6 +195,36 @@ class Strong extends MarkdownTokenInline {
   @override
   InlineSpan render(BuildContext context) {
     return _ConfigProvider.strongRendererOf(context)(this);
+  }
+
+  @override
+  String toString() {
+    return '[Plaintext] $content';
+  }
+}
+
+class Emphasis extends MarkdownTokenInline {
+  static const String typename = 'type_emphasis';
+
+  static const String source =
+      '(?<$typename>(?:\\*(?<content>\\S(?:.*\\S)?)\\*)|(?:_(?<content>\\S(?:.*\\S)?)_))';
+
+  final String content;
+
+  const Emphasis(this.content);
+
+  factory Emphasis.fromMatch(RegExpMatch match) {
+    assert(() {
+      final names = match.groupNames.toSet();
+      return names.contains(typename);
+    }());
+
+    return Emphasis(match.namedGroup('content')!);
+  }
+
+  @override
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.emphasisRendererOf(context)(this);
   }
 
   @override

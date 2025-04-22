@@ -27,6 +27,10 @@ class _ConfigProvider extends InheritedWidget {
     return of(context).renderer.strong;
   }
 
+  static TokenRenderer<Emphasis> emphasisRendererOf(BuildContext context) {
+    return of(context).renderer.emphasis;
+  }
+
   final MarkdownRenderer renderer;
 
   const _ConfigProvider({required super.child, required this.renderer});

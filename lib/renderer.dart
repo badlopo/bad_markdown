@@ -34,14 +34,23 @@ TextSpan _strongRenderer(Strong token) {
   );
 }
 
+TextSpan _emphasisRenderer(Emphasis token) {
+  return TextSpan(
+    text: token.content,
+    style: const TextStyle(fontStyle: FontStyle.italic),
+  );
+}
+
 class MarkdownRenderer {
   final TokenRenderer<Heading> heading;
   final TokenRenderer<Blockquote> blockquote;
   final TokenRenderer<Strong> strong;
+  final TokenRenderer<Emphasis> emphasis;
 
   const MarkdownRenderer({
     this.heading = _headingRenderer,
     this.blockquote = _blockquoteRenderer,
     this.strong = _strongRenderer,
+    this.emphasis = _emphasisRenderer,
   });
 }

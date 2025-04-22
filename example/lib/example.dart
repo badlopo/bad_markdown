@@ -1,3 +1,4 @@
+import 'package:bad_markdown/bad_markdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
@@ -8,6 +9,10 @@ const _template = """# heading1
 #### heading4
 ##### heading5
 ###### heading6
+
+> blockquote line 1
+> blockquote line 2
+> blockquote line 3
 
 paragraph content line 1  
 paragraph content line 2  
@@ -21,13 +26,13 @@ paragraph content line 3
 2. ordered list item2
 3. ordered list item3
 
-_strong 1_
+_emphasis 1_
 
-*strong 2*
+*emphasis 2*
 
-__emphasis 1__
+__strong 1__
 
-**emphasis 2**
+**strong 2**
 
 ~delete 1~
 
@@ -38,8 +43,6 @@ __emphasis 1__
 ```
 code block 1
 ```
-
-    code block 2 (indent with at least 4 spaces)
 
 [link](https://example.com)
 
@@ -104,6 +107,40 @@ class _ExampleState extends State<ExamplePage> {
                   'BadMarkdown',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    final _example = """
+___
+
+_ _ _
+
+---
+
+- - -
+
+***
+
+* * *
+""";
+
+                    // GptMarkdown;
+                    final reg = RegExp(
+                      '(?<type_hr>^[ \t]*'
+                      '(?:(?:-[ \t]*){3,})|'
+                      '(?:(?:\\*[ \t]*){3,})|'
+                      '(?:(?:_[ \t]*){3,})'
+                      '\$)',
+                      multiLine: true,
+                    );
+                    final matches = reg.allMatches(_example);
+
+                    print(matches.length);
+                    for (final match in matches) {
+                      print(match.namedGroup('type_hr'));
+                    }
+                  },
+                  child: Text('xxx'),
+                ),
                 const Spacer(),
                 TextButton(onPressed: handleReset, child: const Text('Reset')),
                 TextButton(onPressed: handleClear, child: const Text('Clear')),
@@ -136,6 +173,21 @@ class _ExampleState extends State<ExamplePage> {
                     ),
                   ),
                 ),
+                // Expanded(
+                //   child: Container(
+                //     height: double.infinity,
+                //     margin: const EdgeInsets.all(16),
+                //     padding: const EdgeInsets.all(16),
+                //     decoration: const BoxDecoration(
+                //       border: Border.fromBorderSide(
+                //         BorderSide(color: Colors.grey),
+                //       ),
+                //     ),
+                //     child: SingleChildScrollView(
+                //       child: GptMarkdown(_content),
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: Container(
                     height: double.infinity,
@@ -146,7 +198,9 @@ class _ExampleState extends State<ExamplePage> {
                         BorderSide(color: Colors.grey),
                       ),
                     ),
-                    child: SingleChildScrollView(child: GptMarkdown(_content)),
+                    child: SingleChildScrollView(
+                      child: BadMarkdown(content: _content),
+                    ),
                   ),
                 ),
               ],

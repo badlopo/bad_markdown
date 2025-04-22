@@ -107,7 +107,7 @@ packages:
     source: sdk
     version: "0.0.0"
   gpt_markdown:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "."
       ref: HEAD

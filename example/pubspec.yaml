@@ -32,8 +32,6 @@ dependencies:
     sdk: flutter
   bad_markdown:
     path: ..
-  gpt_markdown:
-    git: https://github.com/lopo12123/gpt_markdown.git
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

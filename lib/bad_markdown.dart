@@ -23,6 +23,10 @@ class _ConfigProvider extends InheritedWidget {
     return of(context).renderer.blockquote;
   }
 
+  static TokenRenderer<Strong> strongRendererOf(BuildContext context) {
+    return of(context).renderer.strong;
+  }
+
   final MarkdownRenderer renderer;
 
   const _ConfigProvider({required super.child, required this.renderer});

@@ -5,8 +5,12 @@ typedef MarkdownTokenBuilder = MarkdownToken Function(RegExpMatch match);
 
 sealed class MarkdownToken {
   static const List<String> _regexes = [
+    // block-level
     Heading.source,
     Blockquote.source,
+
+    // inline-level
+    Strong.source,
 
     // non_exhaustive!
   ];
@@ -37,7 +41,7 @@ sealed class MarkdownToken {
     Blockquote.typename: Blockquote.fromMatch,
 
     // inline-level
-    // ...
+    Strong.typename: Strong.fromMatch,
 
     // non_exhaustive!
   };
@@ -159,6 +163,36 @@ class Plaintext extends MarkdownTokenInline {
   @override
   TextSpan render(BuildContext context) {
     return TextSpan(text: content);
+  }
+
+  @override
+  String toString() {
+    return '[Plaintext] $content';
+  }
+}
+
+class Strong extends MarkdownTokenInline {
+  static const String typename = 'type_strong';
+
+  static const String source =
+      '(?<$typename>(?:\\*\\*(?<content>\\S(?:.*\\S)?)\\*\\*)|(?:__(?<content>\\S(?:.*\\S)?)__))';
+
+  final String content;
+
+  const Strong(this.content);
+
+  factory Strong.fromMatch(RegExpMatch match) {
+    assert(() {
+      final names = match.groupNames.toSet();
+      return names.contains(typename);
+    }());
+
+    return Strong(match.namedGroup('content')!);
+  }
+
+  @override
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.strongRendererOf(context)(this);
   }
 
   @override

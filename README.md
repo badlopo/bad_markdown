@@ -8,9 +8,9 @@
 
 | Type     | Support |
 |----------|---------|
-| strong   | ⏳       |
-| emphasis | ⏳       |
-| delete   | ⏳       |
+| strong   | ✅       |
+| emphasis | ✅       |
+| delete   | ✅       |
 | link     | ⏳       |
 | image    | ⏳       |
 | codespan | ⏳       |
@@ -19,13 +19,13 @@
 
 | Type                | Support |
 |---------------------|---------|
-| heading             | ⏳       |
-| blockquote          | ⏳       |
+| heading             | ✅       |
+| blockquote          | 🔨      |
 | codeblock           | ⏳       |
 | unordered-list-item | ⏳       |
 | ordered-list-item   | ⏳       |
 | table               | ⏳       |
-| horizontal-rule     | ⏳       |
+| horizontal-rule     | ✅       |
 | checkbox            | ⏳       |
 
 ## Build-in Renderer

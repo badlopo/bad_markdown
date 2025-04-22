@@ -23,6 +23,10 @@ class _ConfigProvider extends InheritedWidget {
     return of(context).renderer.blockquote;
   }
 
+  static TokenRenderer<Hr> hrRendererOf(BuildContext context) {
+    return of(context).renderer.hr;
+  }
+
   static TokenRenderer<Strong> strongRendererOf(BuildContext context) {
     return of(context).renderer.strong;
   }
@@ -30,7 +34,6 @@ class _ConfigProvider extends InheritedWidget {
   static TokenRenderer<Emphasis> emphasisRendererOf(BuildContext context) {
     return of(context).renderer.emphasis;
   }
-
 
   static TokenRenderer<Delete> deleteRendererOf(BuildContext context) {
     return of(context).renderer.delete;

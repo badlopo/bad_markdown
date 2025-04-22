@@ -27,6 +27,10 @@ WidgetSpan _blockquoteRenderer(Blockquote token) {
   );
 }
 
+WidgetSpan _hrRenderer(Hr token) {
+  return const WidgetSpan(child: Divider());
+}
+
 TextSpan _strongRenderer(Strong token) {
   return TextSpan(
     text: token.content,
@@ -51,6 +55,7 @@ TextSpan _deleteRenderer(Delete token) {
 class MarkdownRenderer {
   final TokenRenderer<Heading> heading;
   final TokenRenderer<Blockquote> blockquote;
+  final TokenRenderer<Hr> hr;
   final TokenRenderer<Strong> strong;
   final TokenRenderer<Emphasis> emphasis;
   final TokenRenderer<Delete> delete;
@@ -58,6 +63,7 @@ class MarkdownRenderer {
   const MarkdownRenderer({
     this.heading = _headingRenderer,
     this.blockquote = _blockquoteRenderer,
+    this.hr = _hrRenderer,
     this.strong = _strongRenderer,
     this.emphasis = _emphasisRenderer,
     this.delete = _deleteRenderer,

@@ -8,6 +8,7 @@ sealed class MarkdownToken {
     // block-level
     Heading.source,
     Blockquote.source,
+    Hr.source,
 
     // inline-level
     Strong.source,
@@ -41,6 +42,7 @@ sealed class MarkdownToken {
     // block-level
     Heading.typename: Heading.fromMatch,
     Blockquote.typename: Blockquote.fromMatch,
+    Hr.typename: Hr.fromMatch,
 
     // inline-level
     Strong.typename: Strong.fromMatch,
@@ -156,6 +158,29 @@ class Blockquote extends MarkdownTokenBlock {
   String toString() {
     final int line = lines.length;
     return '[Blockquote] $line line${line == 1 ? '' : 's'}';
+  }
+}
+
+class Hr extends MarkdownTokenBlock {
+  static const String typename = 'type_hr';
+
+  static const String source =
+      '(?<$typename>^[ \t]*(?:(?:-[ \t]*){3,})|(?:(?:\\*[ \t]*){3,})|(?:(?:_[ \t]*){3,})\$)';
+
+  const Hr();
+
+  factory Hr.fromMatch(RegExpMatch match) {
+    assert(() {
+      final names = match.groupNames.toSet();
+      return names.contains(typename);
+    }());
+
+    return const Hr();
+  }
+
+  @override
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.hrRendererOf(context)(this);
   }
 }
 

@@ -12,6 +12,7 @@ sealed class MarkdownToken {
     // inline-level
     Strong.source,
     Emphasis.source,
+    Delete.source,
 
     // non_exhaustive!
   ];
@@ -44,6 +45,7 @@ sealed class MarkdownToken {
     // inline-level
     Strong.typename: Strong.fromMatch,
     Emphasis.typename: Emphasis.fromMatch,
+    Delete.typename: Delete.fromMatch,
 
     // non_exhaustive!
   };
@@ -199,7 +201,7 @@ class Strong extends MarkdownTokenInline {
 
   @override
   String toString() {
-    return '[Plaintext] $content';
+    return '[Strong] $content';
   }
 }
 
@@ -229,6 +231,35 @@ class Emphasis extends MarkdownTokenInline {
 
   @override
   String toString() {
-    return '[Plaintext] $content';
+    return '[Emphasis] $content';
+  }
+}
+
+class Delete extends MarkdownTokenInline {
+  static const String typename = 'type_delete';
+
+  static const String source = '(?<$typename>~~(?<content>\\S(?:.*\\S)?)~~)';
+
+  final String content;
+
+  const Delete(this.content);
+
+  factory Delete.fromMatch(RegExpMatch match) {
+    assert(() {
+      final names = match.groupNames.toSet();
+      return names.contains(typename);
+    }());
+
+    return Delete(match.namedGroup('content')!);
+  }
+
+  @override
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.deleteRendererOf(context)(this);
+  }
+
+  @override
+  String toString() {
+    return '[Delete] $content';
   }
 }

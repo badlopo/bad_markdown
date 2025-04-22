@@ -41,16 +41,25 @@ TextSpan _emphasisRenderer(Emphasis token) {
   );
 }
 
+TextSpan _deleteRenderer(Delete token) {
+  return TextSpan(
+    text: token.content,
+    style: const TextStyle(decoration: TextDecoration.lineThrough),
+  );
+}
+
 class MarkdownRenderer {
   final TokenRenderer<Heading> heading;
   final TokenRenderer<Blockquote> blockquote;
   final TokenRenderer<Strong> strong;
   final TokenRenderer<Emphasis> emphasis;
+  final TokenRenderer<Delete> delete;
 
   const MarkdownRenderer({
     this.heading = _headingRenderer,
     this.blockquote = _blockquoteRenderer,
     this.strong = _strongRenderer,
     this.emphasis = _emphasisRenderer,
+    this.delete = _deleteRenderer,
   });
 }

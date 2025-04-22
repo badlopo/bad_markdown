@@ -31,6 +31,11 @@ class _ConfigProvider extends InheritedWidget {
     return of(context).renderer.emphasis;
   }
 
+
+  static TokenRenderer<Delete> deleteRendererOf(BuildContext context) {
+    return of(context).renderer.delete;
+  }
+
   final MarkdownRenderer renderer;
 
   const _ConfigProvider({required super.child, required this.renderer});

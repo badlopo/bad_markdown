@@ -14,6 +14,7 @@ sealed class MarkdownToken {
     Strong.source,
     Emphasis.source,
     Delete.source,
+    Image.source,
 
     // non_exhaustive!
   ];
@@ -48,6 +49,7 @@ sealed class MarkdownToken {
     Strong.typename: Strong.fromMatch,
     Emphasis.typename: Emphasis.fromMatch,
     Delete.typename: Delete.fromMatch,
+    Image.typename: Image.fromMatch,
 
     // non_exhaustive!
   };
@@ -286,5 +288,45 @@ class Delete extends MarkdownTokenInline {
   @override
   String toString() {
     return '[Delete] $content';
+  }
+}
+
+class Image extends MarkdownTokenInline {
+  static const String typename = 'type_image';
+
+  static const String source =
+      '(?<$typename>!\\[(?<alt>[^\\]]*)\\]\\((?<src>[^) ]+)(?: "(?<title>[^)]+)")?\\))';
+
+  final String alt;
+  final String src;
+  final String? title;
+
+  const Image({required this.alt, required this.src, required this.title});
+
+  factory Image.fromMatch(RegExpMatch match) {
+    assert(() {
+      final names = match.groupNames.toSet();
+
+      return names.contains(typename) &&
+          names.contains('alt') &&
+          names.contains('src') &&
+          names.contains('title');
+    }());
+
+    return Image(
+      alt: match.namedGroup('alt')!,
+      src: match.namedGroup('src')!,
+      title: match.namedGroup('title'),
+    );
+  }
+
+  @override
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.imageRendererOf(context)(this);
+  }
+
+  @override
+  String toString() {
+    return '[Image] $alt ($src)';
   }
 }

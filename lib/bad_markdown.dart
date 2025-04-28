@@ -1,7 +1,7 @@
 library bad_markdown;
 
 import 'package:flutter/material.dart';
-import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:flutter/widgets.dart' as widgets show Image;
 
 part 'renderer.dart';
 
@@ -37,6 +37,10 @@ class _ConfigProvider extends InheritedWidget {
 
   static TokenRenderer<Delete> deleteRendererOf(BuildContext context) {
     return of(context).renderer.delete;
+  }
+
+  static TokenRenderer<Image> imageRendererOf(BuildContext context) {
+    return of(context).renderer.image;
   }
 
   final MarkdownRenderer renderer;

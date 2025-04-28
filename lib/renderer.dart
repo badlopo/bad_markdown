@@ -52,6 +52,10 @@ TextSpan _deleteRenderer(Delete token) {
   );
 }
 
+WidgetSpan _imageRenderer(Image token) {
+  return WidgetSpan(child: widgets.Image.network(token.src));
+}
+
 class MarkdownRenderer {
   final TokenRenderer<Heading> heading;
   final TokenRenderer<Blockquote> blockquote;
@@ -59,6 +63,7 @@ class MarkdownRenderer {
   final TokenRenderer<Strong> strong;
   final TokenRenderer<Emphasis> emphasis;
   final TokenRenderer<Delete> delete;
+  final TokenRenderer<Image> image;
 
   const MarkdownRenderer({
     this.heading = _headingRenderer,
@@ -67,5 +72,6 @@ class MarkdownRenderer {
     this.strong = _strongRenderer,
     this.emphasis = _emphasisRenderer,
     this.delete = _deleteRenderer,
+    this.image = _imageRenderer,
   });
 }

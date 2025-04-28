@@ -15,6 +15,7 @@ sealed class MarkdownToken {
     Emphasis.source,
     Delete.source,
     Image.source,
+    Link.source,
 
     // non_exhaustive!
   ];
@@ -50,6 +51,7 @@ sealed class MarkdownToken {
     Emphasis.typename: Emphasis.fromMatch,
     Delete.typename: Delete.fromMatch,
     Image.typename: Image.fromMatch,
+    Link.typename: Link.fromMatch,
 
     // non_exhaustive!
   };
@@ -117,7 +119,7 @@ class Heading extends MarkdownTokenBlock {
 
   @override
   InlineSpan render(BuildContext context) {
-    return _ConfigProvider.headingRendererOf(context)(this);
+    return _ConfigProvider.headingRendererOf(context)(context, this);
   }
 
   @override
@@ -153,7 +155,7 @@ class Blockquote extends MarkdownTokenBlock {
 
   @override
   InlineSpan render(BuildContext context) {
-    return _ConfigProvider.blockquoteRendererOf(context)(this);
+    return _ConfigProvider.blockquoteRendererOf(context)(context, this);
   }
 
   @override
@@ -182,7 +184,7 @@ class Hr extends MarkdownTokenBlock {
 
   @override
   InlineSpan render(BuildContext context) {
-    return _ConfigProvider.hrRendererOf(context)(this);
+    return _ConfigProvider.hrRendererOf(context)(context, this);
   }
 }
 
@@ -223,7 +225,7 @@ class Strong extends MarkdownTokenInline {
 
   @override
   InlineSpan render(BuildContext context) {
-    return _ConfigProvider.strongRendererOf(context)(this);
+    return _ConfigProvider.strongRendererOf(context)(context, this);
   }
 
   @override
@@ -253,7 +255,7 @@ class Emphasis extends MarkdownTokenInline {
 
   @override
   InlineSpan render(BuildContext context) {
-    return _ConfigProvider.emphasisRendererOf(context)(this);
+    return _ConfigProvider.emphasisRendererOf(context)(context, this);
   }
 
   @override
@@ -282,7 +284,7 @@ class Delete extends MarkdownTokenInline {
 
   @override
   InlineSpan render(BuildContext context) {
-    return _ConfigProvider.deleteRendererOf(context)(this);
+    return _ConfigProvider.deleteRendererOf(context)(context, this);
   }
 
   @override
@@ -322,11 +324,51 @@ class Image extends MarkdownTokenInline {
 
   @override
   InlineSpan render(BuildContext context) {
-    return _ConfigProvider.imageRendererOf(context)(this);
+    return _ConfigProvider.imageRendererOf(context)(context, this);
   }
 
   @override
   String toString() {
     return '[Image] $alt ($src)';
+  }
+}
+
+class Link extends MarkdownTokenInline {
+  static const String typename = 'type_link';
+
+  static const String source =
+      '(?<$typename>\\[(?<text>[^\\]]*)\\]\\((?<href>[^) ]+)(?: "(?<title>[^)]+)")?\\))';
+
+  final String text;
+  final String href;
+  final String? title;
+
+  const Link({required this.text, required this.href, required this.title});
+
+  factory Link.fromMatch(RegExpMatch match) {
+    assert(() {
+      final names = match.groupNames.toSet();
+
+      return names.contains(typename) &&
+          names.contains('text') &&
+          names.contains('href') &&
+          names.contains('title');
+    }());
+
+    return Link(
+      text: match.namedGroup('text')!,
+      href: match.namedGroup('href')!,
+      title: match.namedGroup('title'),
+    );
+  }
+
+  @override
+  InlineSpan render(BuildContext context) {
+    return _ConfigProvider.linkRendererOf(context)(context, this);
+  }
+
+  @override
+  String toString() {
+    return '[Link] $text ($href)';
   }
 }

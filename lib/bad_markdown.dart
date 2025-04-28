@@ -1,5 +1,6 @@
 library bad_markdown;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart' as widgets show Image;
 
@@ -9,43 +10,58 @@ part 'style.dart';
 
 part 'token.dart';
 
+typedef OnLinkTap = void Function(Link token);
+
 // OPTIMIZE: use 'InheritedModel' instead
 class _ConfigProvider extends InheritedWidget {
-  static _ConfigProvider of(BuildContext context) {
+  static _ConfigProvider _of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<_ConfigProvider>()!;
   }
 
   static TokenRenderer<Heading> headingRendererOf(BuildContext context) {
-    return of(context).renderer.heading;
+    return _of(context).renderer.heading;
   }
 
   static TokenRenderer<Blockquote> blockquoteRendererOf(BuildContext context) {
-    return of(context).renderer.blockquote;
+    return _of(context).renderer.blockquote;
   }
 
   static TokenRenderer<Hr> hrRendererOf(BuildContext context) {
-    return of(context).renderer.hr;
+    return _of(context).renderer.hr;
   }
 
   static TokenRenderer<Strong> strongRendererOf(BuildContext context) {
-    return of(context).renderer.strong;
+    return _of(context).renderer.strong;
   }
 
   static TokenRenderer<Emphasis> emphasisRendererOf(BuildContext context) {
-    return of(context).renderer.emphasis;
+    return _of(context).renderer.emphasis;
   }
 
   static TokenRenderer<Delete> deleteRendererOf(BuildContext context) {
-    return of(context).renderer.delete;
+    return _of(context).renderer.delete;
   }
 
   static TokenRenderer<Image> imageRendererOf(BuildContext context) {
-    return of(context).renderer.image;
+    return _of(context).renderer.image;
+  }
+
+  static TokenRenderer<Link> linkRendererOf(BuildContext context) {
+    return _of(context).renderer.link;
+  }
+
+  static OnLinkTap? onLinkOf(BuildContext context) {
+    return _of(context).onLink;
   }
 
   final MarkdownRenderer renderer;
+  final OnLinkTap? onLink;
 
-  const _ConfigProvider({required super.child, required this.renderer});
+  const _ConfigProvider({
+    required super.child,
+    required this.renderer,
+    this.onLink,
+  });
 
   @override
   bool updateShouldNotify(covariant _ConfigProvider oldWidget) {
@@ -55,11 +71,13 @@ class _ConfigProvider extends InheritedWidget {
 
 class BadMarkdown extends StatefulWidget {
   final MarkdownRenderer renderer;
+  final OnLinkTap? onLinkTap;
   final String content;
 
   const BadMarkdown({
     super.key,
     this.renderer = const MarkdownRenderer(),
+    this.onLinkTap,
     required this.content,
   });
 
@@ -91,6 +109,7 @@ class _MarkdownState extends State<BadMarkdown> {
     // return GptMarkdown(widget.content);
     return _ConfigProvider(
       renderer: widget.renderer,
+      onLink: widget.onLinkTap,
       child: _MarkdownRendererDelegate(tokens),
     );
   }

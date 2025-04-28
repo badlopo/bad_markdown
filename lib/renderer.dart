@@ -1,9 +1,9 @@
 part of 'bad_markdown.dart';
 
 typedef TokenRenderer<Token extends MarkdownToken> = InlineSpan Function(
-    Token token);
+    BuildContext context, Token token);
 
-InlineSpan _headingRenderer(Heading token) {
+InlineSpan _headingRenderer(BuildContext context, Heading token) {
   return WidgetSpan(
     child: Text(
       token.title,
@@ -12,7 +12,7 @@ InlineSpan _headingRenderer(Heading token) {
   );
 }
 
-WidgetSpan _blockquoteRenderer(Blockquote token) {
+WidgetSpan _blockquoteRenderer(BuildContext context, Blockquote token) {
   return WidgetSpan(
     child: Container(
       padding: const EdgeInsets.only(left: 12),
@@ -27,33 +27,55 @@ WidgetSpan _blockquoteRenderer(Blockquote token) {
   );
 }
 
-WidgetSpan _hrRenderer(Hr token) {
+WidgetSpan _hrRenderer(BuildContext context, Hr token) {
   return const WidgetSpan(child: Divider());
 }
 
-TextSpan _strongRenderer(Strong token) {
+TextSpan _strongRenderer(BuildContext context, Strong token) {
   return TextSpan(
     text: token.content,
     style: const TextStyle(fontWeight: FontWeight.bold),
   );
 }
 
-TextSpan _emphasisRenderer(Emphasis token) {
+TextSpan _emphasisRenderer(BuildContext context, Emphasis token) {
   return TextSpan(
     text: token.content,
     style: const TextStyle(fontStyle: FontStyle.italic),
   );
 }
 
-TextSpan _deleteRenderer(Delete token) {
+TextSpan _deleteRenderer(BuildContext context, Delete token) {
   return TextSpan(
     text: token.content,
     style: const TextStyle(decoration: TextDecoration.lineThrough),
   );
 }
 
-WidgetSpan _imageRenderer(Image token) {
+WidgetSpan _imageRenderer(BuildContext context, Image token) {
   return WidgetSpan(child: widgets.Image.network(token.src));
+}
+
+TextSpan _linkRenderer(BuildContext context, Link token) {
+  GestureRecognizer? recognizer;
+
+  final onLink = _ConfigProvider.onLinkOf(context);
+  if (onLink != null) {
+    recognizer = TapGestureRecognizer()
+      ..onTap = () {
+        onLink(token);
+      };
+  }
+
+  return TextSpan(
+    text: token.text,
+    recognizer: recognizer,
+    style: const TextStyle(
+      color: Colors.blue,
+      decoration: TextDecoration.underline,
+      decorationColor: Colors.blue,
+    ),
+  );
 }
 
 class MarkdownRenderer {
@@ -64,6 +86,7 @@ class MarkdownRenderer {
   final TokenRenderer<Emphasis> emphasis;
   final TokenRenderer<Delete> delete;
   final TokenRenderer<Image> image;
+  final TokenRenderer<Link> link;
 
   const MarkdownRenderer({
     this.heading = _headingRenderer,
@@ -73,5 +96,6 @@ class MarkdownRenderer {
     this.emphasis = _emphasisRenderer,
     this.delete = _deleteRenderer,
     this.image = _imageRenderer,
+    this.link = _linkRenderer,
   });
 }

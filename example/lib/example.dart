@@ -1,7 +1,6 @@
 import 'package:bad_markdown/bad_markdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gpt_markdown/gpt_markdown.dart';
 
 const _template = """# heading1
 ## heading2
@@ -44,9 +43,13 @@ __strong 1__
 code block 1
 ```
 
-[link](https://example.com)
+[link to "example.com" without title](https://example.com)
 
-![image](https://example.com)
+[link to "example.com" with title](https://example.com "example.com")
+
+![picsum image without title](https://picsum.photos/200)
+
+![picsum image with title](https://picsum.photos/200 "picsum image")
 
 horizontal rules
 
@@ -110,33 +113,23 @@ class _ExampleState extends State<ExamplePage> {
                 ElevatedButton(
                   onPressed: () {
                     final _example = """
-___
+![GitHub Logo without title](https://github.com/favicon.ico)![GitHub Logo](https://github.com/favicon.ico "GitHub Favicon")
 
-_ _ _
-
----
-
-- - -
-
-***
-
-* * *
+[link to "example.com" without title](https://example.com)[link to "example.com" with title](https://example.com example)
 """;
 
-                    // GptMarkdown;
                     final reg = RegExp(
-                      '(?<type_hr>^[ \t]*'
-                      '(?:(?:-[ \t]*){3,})|'
-                      '(?:(?:\\*[ \t]*){3,})|'
-                      '(?:(?:_[ \t]*){3,})'
-                      '\$)',
+                      '(?<type_image>!\\[(?<alt>[^\\]]*)\\]\\((?<src>[^) ]+)(?: "(?<title>[^)]+)")?\\))',
                       multiLine: true,
                     );
                     final matches = reg.allMatches(_example);
 
                     print(matches.length);
                     for (final match in matches) {
-                      print(match.namedGroup('type_hr'));
+                      print("whole: ${match.namedGroup('type_image')}");
+                      print("alt: ${match.namedGroup('alt')}");
+                      print("src: ${match.namedGroup('src')}");
+                      print("title: ${match.namedGroup('title')}");
                     }
                   },
                   child: Text('xxx'),
@@ -199,7 +192,12 @@ _ _ _
                       ),
                     ),
                     child: SingleChildScrollView(
-                      child: BadMarkdown(content: _content),
+                      child: BadMarkdown(
+                        onLinkTap: (token) {
+                          print(token);
+                        },
+                        content: _content,
+                      ),
                     ),
                   ),
                 ),

@@ -24,8 +24,8 @@
 | [strong](#Strong)     | ✅       |
 | [emphasis](#Emphasis) | ✅       |
 | [delete](#Delete)     | ✅       |
+| [image](#Image)       | ⏳       |
 | link                  | ⏳       |
-| image                 | ⏳       |
 | codespan              | ⏳       |
 
 ## Heading
@@ -136,13 +136,33 @@ _emphasis syntax 2_
 
 ![Delete](./doc/delete.png)
 
-## Link
-
-WIP
-
 ## Image
 
-WIP
+### Supported syntax
+
+```text
+![picsum image without title](https://picsum.photos/200)
+
+![picsum image with title](https://picsum.photos/200 "picsum image")
+```
+
+### Default Style
+
+![Image](./doc/image.png)
+
+## Link
+
+### Supported syntax
+
+```text
+[link to "example.com" without title](https://example.com)
+
+[link to "example.com" with title](https://example.com "example.com")
+```
+
+### Default Style
+
+![Link](./doc/link.png)
 
 ## Codespan
 
